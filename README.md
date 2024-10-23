@@ -4,8 +4,10 @@
 This project focuses on adapting a lemmatizer based on a Random Forest classifier to predict Part-of-Speech (POS) tagging for Kazakh words. The objective was to create an efficient model that can accurately identify the grammatical category of Kazakh words, which is crucial for various natural language processing tasks.
 
 ## Data Source
-The dataset used in this project was sourced from https://github.com/nlacslab/kazdet/blob/master/data/kdt-NLANU-0.01.connlu.txt.7z. 
-It contains annotated samples of Kazakh text, providing more than 700K tokens to split for training and testing the model.
+Source of the 3 datasets :
+Kazakh corpus : https://github.com/nlacslab/kazdet/blob/master/data/kdt-NLANU-0.01.connlu.txt.7z. 
+English corpus : https://github.com/UniversalDependencies/UD_English-EWT/blob/master/en_ewt-ud-dev.conllu
+Turkish corpus : https://github.com/UniversalDependencies/UD_Turkish-Kenet/blob/master/tr_kenet-ud-dev.conllu
 
 ## Methodology
 The algorithm employed for this project is the Extra Trees classifier.
