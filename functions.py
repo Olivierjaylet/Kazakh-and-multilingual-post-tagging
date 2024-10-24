@@ -8,10 +8,27 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
+import os
 
 
-# functions
-def get_values(df):
+###################################################################################################
+####################################### FEATURE ENGINEERING #######################################
+###################################################################################################
+
+def get_values(
+        df
+        ):
+    """Extracts the values of 'WORD' and 'POS' columns from the input DataFrame.
+
+    Args:
+        df (pandas.DataFrame): DataFrame containing 'WORD' and 'POS' columns.
+
+    Returns:
+        tuple: A tuple containing:
+            - X_lex (numpy.ndarray): Array of cleaned words.
+            - y_lex (numpy.ndarray): Array of cleaned POS tags.
+    """
+
     X_lex = df['WORD'].str.strip()
     X_lex = X_lex.values
 
@@ -19,7 +36,20 @@ def get_values(df):
     y_lex = y_lex.values
 
     return X_lex, y_lex
-def list_all_POS_tags(y) :
+
+
+def list_all_POS_tags(
+        y
+        ) :
+    """Lists all unique POS tags from the input array.
+
+    Args:
+        y (array-like): Array of POS tag strings.
+
+    Returns:
+        list: A list of unique POS tags.
+    """
+
     list_tags = []
     for tag_list in y :
         tags = tag_list.split()
@@ -28,12 +58,90 @@ def list_all_POS_tags(y) :
                 list_tags.append(tag)
     return list_tags
 
-def set_up_POS_tag_encoder(list_tags) :
+
+def clean_data(
+        df
+        ):
+    """Cleans the input DataFrame by dropping NaN values and removing punctuation.
+
+    Args:
+        df (pandas.DataFrame): DataFrame containing 'WORD' and 'POS' columns.
+
+    Returns:
+        tuple: A tuple containing:
+            - X_lex (numpy.ndarray): Array of cleaned words.
+            - Y_lex (numpy.ndarray): Array of cleaned POS tags.
+    """
+
+    # Drop rows where 'WORD' is NaN
+    df = df.dropna(subset=['WORD'])
+
+    # Remove punctuation characters
+    df = df[df['POS'] != 'PUNCT']
+
+    # Some characters to remove
+    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\.\–\’\:\@]"
+
+    # Removing the characters from the 'WORD' column
+    df['WORD'] = df['WORD'].str.replace(chars_to_remove,
+                                        '',
+                                        regex=True
+                                        )
+    
+    # list of tags we want to predict
+    POS_tag_keep = ['NOUN', 'VERB', 'ADJ', 'PROPN', 'NUM', 'ADV', 'ADP', 'CCONJ', 'PRON', 'DET', 'SCONJ', 'AUX', 'INTJ']
+    
+    df = df[df['POS'].isin(POS_tag_keep)]
+
+    # convert to string type
+    df["WORD"] = df["WORD"].astype(str)
+    df["POS"] = df["POS"].astype(str)
+
+    df = df.sample(n=1000, # for computational reasons 
+                random_state=42
+                )
+
+    print("Size dataset : ", df.shape)
+
+    # Split into train & test sets
+    X_lex, Y_lex = get_values(df)
+
+    return X_lex, Y_lex
+
+
+def set_up_POS_tag_encoder(
+        list_tags
+        ) :
+    """Sets up a label encoder for the POS tags.
+
+    Args:
+        list_tags (list): List of POS tags.
+
+    Returns:
+        LabelEncoder: A fitted label encoder for the provided POS tags.
+    """
     encoder_tag = LabelEncoder().fit(list_tags)
     return encoder_tag
 
+
 # vec encoding of words
-def alpha_vec2(w, mx, max_word_len, dic):
+def alpha_vec2(
+        w, 
+        mx, 
+        max_word_len, 
+        dic
+        ) :
+    """Converts a word to its vector representation using a given dictionary.
+
+    Args:
+        w (str): The word to be converted.
+        mx (numpy.ndarray): The matrix of word vectors.
+        max_word_len (int): The maximum length of words.
+        dic (numpy.ndarray): The dictionary of words.
+
+    Returns:
+        numpy.ndarray: The vector representation of the word.
+    """
     vec = np.zeros((max_word_len, len(dic)))
     for i in range(0, len(w)):
         vec[i] = mx[np.where(dic == w[i])[0][0]]
@@ -45,13 +153,26 @@ def alpha_vec2(w, mx, max_word_len, dic):
     return vec
 
 
-
 def calculate_results(Y_test,
                       Y_train, 
                       predicts_test, 
                       predicts_train
-                      ):
+                      ) :
+    """Calculates accuracy and F1 score for the test and train datasets.
 
+    Args:
+        Y_test (array-like): True labels for the test dataset.
+        Y_train (array-like): True labels for the train dataset.
+        predicts_test (array-like): Predicted labels for the test dataset.
+        predicts_train (array-like): Predicted labels for the train dataset.
+
+    Returns:
+        tuple: A tuple containing:
+            - test_acc (float): Accuracy of the test dataset.
+            - test_f1 (float): F1 score of the test dataset.
+            - train_acc (float): Accuracy of the train dataset.
+            - train_f1 (float): F1 score of the train dataset.
+    """
     test_acc = accuracy_score(Y_test,
                             predicts_test
                             )
@@ -70,32 +191,25 @@ def calculate_results(Y_test,
     
     return test_acc, test_f1, train_acc, train_f1
 
-def plot_confusion_matrix(Y, predicts, list_tags, title):
-  
-  cm = confusion_matrix(Y, 
-                        predicts, 
-                        labels = np.arange(len(list_tags))
-                        )
 
-  cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+def per_tag_accuracy(
+        y_true, 
+        y_pred, 
+        list_tags, 
+        encoder
+        ) :
+    """Calculates accuracy per POS tag.
 
-  plt.figure(figsize=(8, 6))
-  sns.heatmap(cm_normalized,
-              annot=True,
-              fmt='.2f',
-              cmap='Blues',
-              xticklabels=list_tags,
-              yticklabels=list_tags)
-  title = 'Confusion Matrix of ' + title
-  plt.title(title)
-  plt.xlabel('Predicted Labels')
-  plt.ylabel('True Labels')
+    Args:
+        y_true (array-like): True labels.
+        y_pred (array-like): Predicted labels.
+        list_tags (list): List of POS tags.
+        encoder (LabelEncoder): Label encoder for transforming tags.
 
-  plt.tight_layout()
-  plt.show()
+    Returns:
+        pandas.DataFrame: DataFrame containing POS tags and their respective accuracies.
+    """
 
-
-def per_tag_accuracy(y_true, y_pred, list_tags, encoder):
     tag_names = []
     accuracies = []
 
@@ -116,33 +230,24 @@ def per_tag_accuracy(y_true, y_pred, list_tags, encoder):
     return df_accuracy
 
 
-def tag_prediction_nb(y_true, y_pred, list_tags, encoder):
+def mistake_frequency_by_word_type(
+        y_true, 
+        y_pred, 
+        list_tags, 
+        encoder
+        ) :
+    """Calculates the frequency of mistakes by word type in the predictions.
 
-    tag_names = []
-    correct_counts = []
-    incorrect_counts = []
+    Args:
+        y_true (array-like): True labels.
+        y_pred (array-like): Predicted labels.
+        list_tags (list): List of POS tags.
+        encoder (LabelEncoder): Label encoder for transforming tags.
 
-    for tag in list_tags:
-        encoded_tag = encoder.transform([tag])[0]
-        idx = np.where(y_true == encoded_tag)
-        
-        correct = np.sum(y_true[idx] == y_pred[idx])
-        incorrect = len(y_true[idx]) - correct
+    Returns:
+        pandas.DataFrame: DataFrame of mistake frequencies sorted by frequency.
+    """
 
-        tag_names.append(tag)
-        correct_counts.append(correct)
-        incorrect_counts.append(incorrect)
-
-    df_distribution = pd.DataFrame({
-        'Tag': tag_names,
-        'Correct Predictions': correct_counts,
-        'Incorrect Predictions': incorrect_counts
-    })
-
-    return df_distribution
-
-def mistake_frequency_by_word_type(y_true, y_pred, list_tags, encoder):
-    
     y_true_decoded = encoder.inverse_transform(y_true)
     y_pred_decoded = encoder.inverse_transform(y_pred)
 
@@ -173,31 +278,115 @@ def mistake_frequency_by_word_type(y_true, y_pred, list_tags, encoder):
     return mistake_freq_df.sort_values(by='Frequency', ascending=False)
 
 
-def clean_data(df):
-    # Drop rows where 'WORD' is NaN
-    df = df.dropna(subset=['WORD'])
+def tag_prediction_nb(
+        y_true, 
+        y_pred, 
+        list_tags, 
+        encoder
+        ) :
+    """Calculates the number of correct and incorrect predictions per tag.
 
-    # Remove punctuation characters
-    df = df[df['POS'] != 'PUNCT']
+    Args:
+        y_true (array-like): True labels.
+        y_pred (array-like): Predicted labels.
+        list_tags (list): List of POS tags.
+        encoder (LabelEncoder): Label encoder for transforming tags.
 
-    # Some characters to remove
-    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\.\–\’\:\@]"
+    Returns:
+        pandas.DataFrame: DataFrame containing POS tags and counts of correct/incorrect predictions.
+    """
 
-    # Removing the characters from the 'WORD' column
-    df['WORD'] = df['WORD'].str.replace(chars_to_remove,
-                                        '',
-                                        regex=True
-                                        )
-    df = df[df['POS'] != 'X']
+    tag_names = []
+    correct_counts = []
+    incorrect_counts = []
 
-    df["WORD"] = df["WORD"].astype(str)
-    df["POS"] = df["POS"].astype(str)
+    for tag in list_tags:
+        encoded_tag = encoder.transform([tag])[0]
+        idx = np.where(y_true == encoded_tag)
+        
+        correct = np.sum(y_true[idx] == y_pred[idx])
+        incorrect = len(y_true[idx]) - correct
 
-    df = df.sample(n=2000, # for computational reasons 
-                random_state=42
-                )
+        tag_names.append(tag)
+        correct_counts.append(correct)
+        incorrect_counts.append(incorrect)
 
-    # Split into train & test sets
-    X_lex, Y_lex = get_values(df)
+    df_distribution = pd.DataFrame({
+        'Tag': tag_names,
+        'Correct Predictions': correct_counts,
+        'Incorrect Predictions': incorrect_counts
+    })
 
-    return X_lex, Y_lex
+    return df_distribution
+
+
+
+########################################################################################
+####################################### GRAPHICS #######################################
+########################################################################################
+
+def plot_confusion_matrix(
+        Y, 
+        predicts, 
+        list_tags, 
+        title, 
+        lang
+        ) :
+    # Compute confusion matrix
+    cm = confusion_matrix(Y, 
+                          predicts, 
+                          labels=np.arange(len(list_tags)))
+
+    # Normalize the confusion matrix
+    cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+    # Create the figure
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(cm_normalized,
+                annot=True,
+                fmt='.2f',
+                cmap='Blues',
+                xticklabels=list_tags,
+                yticklabels=list_tags,
+                ax=ax)
+
+    plot_title = 'Confusion Matrix of ' + title + " for " + lang + "corpus"
+    ax.set_title(plot_title)
+    ax.set_xlabel('Predicted Labels')
+    ax.set_ylabel('True Labels')
+
+    plt.tight_layout()
+
+    return fig
+
+
+
+def plot_dist_predictions(
+        df_tag_dist, 
+        lang
+        ) :
+    # Set the title for the plot
+    title = "Distribution of Correct and Incorrect Predictions for " + lang + ' corpus'
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    df_tag_dist.plot(kind='bar', 
+                     x='Tag', 
+                     stacked=True, 
+                     ax=ax) 
+    
+    ax.set_title(title)
+
+    return fig
+
+
+def save_graph_to_folder(
+        fig, 
+        lang, 
+        filename
+        ) :
+
+    # Save the graph to the folder
+    file_path = os.path.join('graphs', lang, filename)
+    fig.savefig(file_path)
+    plt.close(fig)  # Close the figure after saving
