@@ -97,7 +97,7 @@ def clean_data(
     df["WORD"] = df["WORD"].astype(str)
     df["POS"] = df["POS"].astype(str)
 
-    df = df.sample(n=1000, # for computational reasons 
+    df = df.sample(n=10000, # for computational reasons 
                 random_state=42
                 )
 
