@@ -1,0 +1,11 @@
+- Improving neural machine translation with POS-tag features for low-resource language pairs : https://www.cell.com/heliyon/fulltext/S2405-8440(22)01663-2
+- Real-World Semi-Supervised Learning
+of POS-Taggers for Low-Resource Languages : https://aclanthology.org/P13-1057.pdf
+- Real-World Semi-Supervised Learning
+of POS-Taggers for Low-Resource Languages : https://arxiv.org/abs/1904.05426
+Low-resource Languages:
+- A Review of Past Work and Future Challenges : https://arxiv.org/abs/2006.07264
+- A Grounded Unsupervised Universal Part-of-Speech Tagger for
+- Low-Resource Languages : https://arxiv.org/pdf/1904.05426
+- What Can We Get From 1000 Tokens?
+A Case Study of Multilingual POS Tagging For Resource-Poor Languages : https://aclanthology.org/D14-1096.pdf

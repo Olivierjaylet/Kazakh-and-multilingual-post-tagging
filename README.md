@@ -1,4 +1,4 @@
-# Adapt a lemmatize for POS tagging of Kazakh language
+# Kazakh-and-multilingual-post-tagging
 
 ## Project Overview
 This project focuses on adapting a lemmatizer based on a Random Forest classifier to predict Part-of-Speech (POS) tagging for Kazakh words. 
