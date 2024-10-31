@@ -15,28 +15,6 @@ import os
 ####################################### FEATURE ENGINEERING #######################################
 ###################################################################################################
 
-def get_values(
-        df
-        ):
-    """Extracts the values of 'WORD' and 'POS' columns from the input DataFrame.
-
-    Args:
-        df (pandas.DataFrame): DataFrame containing 'WORD' and 'POS' columns.
-
-    Returns:
-        tuple: A tuple containing:
-            - X_lex (numpy.ndarray): Array of cleaned words.
-            - y_lex (numpy.ndarray): Array of cleaned POS tags.
-    """
-
-    X_lex = df['WORD'].str.strip()
-    X_lex = X_lex.values
-
-    y_lex = df['POS'].str.strip()
-    y_lex = y_lex.values
-
-    return X_lex, y_lex
-
 
 def list_all_POS_tags(
         y
@@ -103,10 +81,14 @@ def clean_data(
 
     print("Size dataset : ", df.shape)
 
-    # Split into train & test sets
-    X_lex, Y_lex = get_values(df)
+    
+    X_lex = df['WORD'].str.strip()
+    X_lex = X_lex.values
 
-    return X_lex, Y_lex
+    y_lex = df['POS'].str.strip()
+    y_lex = y_lex.values
+
+    return X_lex, y_lex
 
 
 def set_up_POS_tag_encoder(
