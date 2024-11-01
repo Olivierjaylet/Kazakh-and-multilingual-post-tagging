@@ -16,6 +16,27 @@ import os
 ###################################################################################################
 
 
+def list_all_POS_tags(
+        y
+        ) :
+    """Lists all unique POS tags from the input array.
+
+    Args:
+        y (array-like): Array of POS tag strings.
+
+    Returns:
+        list: A list of unique POS tags.
+    """
+
+    list_tags = []
+    for tag_list in y :
+        tags = tag_list.split()
+        for tag in tags :
+            if tag not in list_tags :
+                list_tags.append(tag)
+    return list_tags
+
+
 def clean_data(
         df
         ):
@@ -37,7 +58,7 @@ def clean_data(
     df = df[df['POS'] != 'PUNCT']
 
     # Some characters to remove
-    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\.\–\’\:\@]"
+    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\.\–\’\:\@\']"
 
     # Removing the characters from the 'WORD' column
     df['WORD'] = df['WORD'].str.replace(chars_to_remove,
