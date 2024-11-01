@@ -16,27 +16,6 @@ import os
 ###################################################################################################
 
 
-def list_all_POS_tags(
-        y
-        ) :
-    """Lists all unique POS tags from the input array.
-
-    Args:
-        y (array-like): Array of POS tag strings.
-
-    Returns:
-        list: A list of unique POS tags.
-    """
-
-    list_tags = []
-    for tag_list in y :
-        tags = tag_list.split()
-        for tag in tags :
-            if tag not in list_tags :
-                list_tags.append(tag)
-    return list_tags
-
-
 def clean_data(
         df
         ):
