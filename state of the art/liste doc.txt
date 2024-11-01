@@ -9,3 +9,13 @@ Low-resource Languages:
 - Low-Resource Languages : https://arxiv.org/pdf/1904.05426
 - What Can We Get From 1000 Tokens?
 A Case Study of Multilingual POS Tagging For Resource-Poor Languages : https://aclanthology.org/D14-1096.pdf
+
+##########################
+TFIDF : 
+1- Luhn, H. P. (1957). A statistical approach to mechanized encoding and searching of literary information.
+IBM Journal of Research and Development, Vol. 1,
+No. 4, pp. 309–317.
+2- Jones, K. S. (1972). A statistical interpretation
+of term specificity and its application in retrieval.
+Journal of Documentation, Vol. 28, No. 1, pp. 11–21.
+##########################
