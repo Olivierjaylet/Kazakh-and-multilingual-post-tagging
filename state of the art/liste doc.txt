@@ -21,3 +21,5 @@ Journal of Documentation, Vol. 28, No. 1, pp. 11–21.
 ##########################
 
 - Viterbi Algorithm : https://www.sciencedirect.com/science/article/pii/S0019995874908766
+
+- interpretation tf-idf : https://www.emerald.com/insight/content/doi/10.1108/eb026526/full/html
