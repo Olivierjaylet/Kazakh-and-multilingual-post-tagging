@@ -55,10 +55,10 @@ def clean_data(
     df = df.dropna(subset=['WORD'])
 
     # Remove punctuation characters
-    df = df[df['POS'] != 'PUNCT']
+    #df = df[df['POS'] != 'PUNCT']
 
     # Some characters to remove
-    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\–\’\:\@\']"
+    chars_to_remove = r"[\#\$\%\&\(\)\+\:\@]"
 
     # Removing the characters from the 'WORD' column
     df['WORD'] = df['WORD'].str.replace(chars_to_remove,
@@ -75,21 +75,21 @@ def clean_data(
     df["WORD"] = df["WORD"].astype(str)
     df["POS"] = df["POS"].astype(str)
 
-    df = df.sample(n=20000, # for computational reasons 
-                random_state=42
+    df = df.head(n=20000
                 )
 
     print("Size dataset : ", df.shape)
 
-    
-    X_lex = df['WORD'].str.strip()
+    return df
+
+def get_values(df_) :
+    X_lex = df_['WORD'].str.strip()
     X_lex = X_lex.values
 
-    y_lex = df['POS'].str.strip()
+    y_lex = df_['POS'].str.strip()
     y_lex = y_lex.values
-
     return X_lex, y_lex
-
+ 
 
 def set_up_POS_tag_encoder(
         list_tags
