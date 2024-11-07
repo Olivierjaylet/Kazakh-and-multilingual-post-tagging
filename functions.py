@@ -36,29 +36,18 @@ def list_all_POS_tags(
                 list_tags.append(tag)
     return list_tags
 
-
 def clean_data(
         df
         ):
-    """Cleans the input DataFrame by dropping NaN values and removing punctuation.
-
-    Args:
-        df (pandas.DataFrame): DataFrame containing 'WORD' and 'POS' columns.
-
-    Returns:
-        tuple: A tuple containing:
-            - X_lex (numpy.ndarray): Array of cleaned words.
-            - Y_lex (numpy.ndarray): Array of cleaned POS tags.
-    """
-
     # Drop rows where 'WORD' is NaN
     df = df.dropna(subset=['WORD'])
 
     # Remove punctuation characters
     #df = df[df['POS'] != 'PUNCT']
-
+    df = df[(df['POS'] != 'PUNCT') | (df['WORD'] == '.')]
     # Some characters to remove
-    chars_to_remove = r"[\#\$\%\&\(\)\+\:\@]"
+    #chars_to_remove = r"[\#\$\%\&\(\)\+\:\@]"
+    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\–\’\:\@\']"
 
     # Removing the characters from the 'WORD' column
     df['WORD'] = df['WORD'].str.replace(chars_to_remove,
@@ -81,6 +70,55 @@ def clean_data(
     print("Size dataset : ", df.shape)
 
     return df
+
+"""
+def clean_data(
+        df
+        ):
+    """
+    #Cleans the input DataFrame by dropping NaN values and removing punctuation.
+
+    #Args:
+    #    df (pandas.DataFrame): DataFrame containing 'WORD' and 'POS' columns.
+
+    #Returns:
+    #    tuple: A tuple containing:
+    #        - X_lex (numpy.ndarray): Array of cleaned words.
+    #        - Y_lex (numpy.ndarray): Array of cleaned POS tags.
+"""
+
+    # Drop rows where 'WORD' is NaN
+    df = df.dropna(subset=['WORD'])
+
+    # Remove punctuation characters
+    df = df[df['POS'] != 'PUNCT']
+
+    # Some characters to remove
+    #chars_to_remove = r"[\#\$\%\&\(\)\+\:\@]"
+    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\–\’\:\@\']"
+
+    # Removing the characters from the 'WORD' column
+    df['WORD'] = df['WORD'].str.replace(chars_to_remove,
+                                        '',
+                                        regex=True
+                                        )
+    
+    # list of tags we want to predict
+    POS_tag_keep = ['NOUN', 'VERB', 'ADJ', 'PROPN', 'NUM', 'ADV', 'ADP', 'CCONJ', 'PRON', 'DET', 'SCONJ', 'AUX', 'INTJ', 'PUNCT']
+    
+    df = df[df['POS'].isin(POS_tag_keep)]
+
+    # convert to string type
+    df["WORD"] = df["WORD"].astype(str)
+    df["POS"] = df["POS"].astype(str)
+
+    df = df.head(n=20000
+                )
+
+    print("Size dataset : ", df.shape)
+
+    return df
+    """
 
 def get_values(df_) :
     X_lex = df_['WORD'].str.strip()
@@ -382,3 +420,58 @@ def save_graph_to_folder(
     file_path = os.path.join('graphs', lang, filename)
     fig.savefig(file_path)
     plt.close(fig)  # Close the figure after saving
+
+
+
+
+
+
+
+
+
+def data_to_nltk(df):
+    # Convert the data into the format that NLTK expects (list of tuples)
+    tagged_sentences = []
+    sentence = []
+
+    for _, row in df.iterrows():
+        if row['WORD'] == ".":  # End of a sentence (you may need to adjust this)
+            sentence.append((row['WORD'], row['POS']))
+            tagged_sentences.append(sentence)
+            sentence = []
+        else:
+            sentence.append((row['WORD'], row['POS']))
+
+    # Handle any remaining sentence
+    if sentence:
+        tagged_sentences.append(sentence)
+    return tagged_sentences
+
+def extract_words_and_tags(nested_list):
+    # Flatten the nested list of tuples
+    words = [word for sentence in nested_list for word, _ in sentence]
+    tags = [tag for sentence in nested_list for _, tag in sentence]
+    
+    # Convert the lists to numpy arrays
+    words_array = np.array(words, dtype=object)
+    tags_array = np.array(tags, dtype=object)
+    
+    return words_array, tags_array
+
+# Function to extract words and POS tags for classification report
+def extract_tags(tagged_data, tagger):
+    y_true = []
+    y_pred = []
+    for sentence in tagged_data:
+        words, true_tags = zip(*sentence)  # separate words and tags
+        predicted_tags = []
+        
+        # Predict tags, handling unknown tags
+        for word in words:
+            
+            prediction = tagger.tag([word])[0][1] if tagger.tag([word]) else "UNK"
+            predicted_tags.append(prediction)
+        y_true.extend(true_tags)
+        y_pred.extend(predicted_tags)
+    
+    return y_true, y_pred
