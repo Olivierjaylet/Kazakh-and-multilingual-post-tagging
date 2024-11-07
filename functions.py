@@ -1,5 +1,5 @@
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import confusion_matrix, accuracy_score, f1_score
+from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, recall_score
 
 
 import matplotlib.pyplot as plt
@@ -58,7 +58,7 @@ def clean_data(
     df = df[df['POS'] != 'PUNCT']
 
     # Some characters to remove
-    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\.\–\’\:\@\']"
+    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\–\’\:\@\']"
 
     # Removing the characters from the 'WORD' column
     df['WORD'] = df['WORD'].str.replace(chars_to_remove,
@@ -67,7 +67,7 @@ def clean_data(
                                         )
     
     # list of tags we want to predict
-    POS_tag_keep = ['NOUN', 'VERB', 'ADJ', 'PROPN', 'NUM', 'ADV', 'ADP', 'CCONJ', 'PRON', 'DET', 'SCONJ', 'AUX', 'INTJ']
+    POS_tag_keep = ['NOUN', 'VERB', 'ADJ', 'PROPN', 'NUM', 'ADV', 'ADP', 'CCONJ', 'PRON', 'DET', 'SCONJ', 'AUX', 'INTJ', 'PUNCT']
     
     df = df[df['POS'].isin(POS_tag_keep)]
 
@@ -75,7 +75,7 @@ def clean_data(
     df["WORD"] = df["WORD"].astype(str)
     df["POS"] = df["POS"].astype(str)
 
-    df = df.sample(n=10000, # for computational reasons 
+    df = df.sample(n=20000, # for computational reasons 
                 random_state=42
                 )
 
@@ -162,6 +162,11 @@ def calculate_results(Y_test,
                     predicts_test,
                     average = "weighted"
                     )
+    
+    test_recall = recall_score(Y_test,
+                        predicts_test,
+                        average = "weighted"
+                        )
 
     train_acc = accuracy_score(Y_train,
                             predicts_train
@@ -170,8 +175,13 @@ def calculate_results(Y_test,
                         predicts_train,
                         average = "weighted"
                         )
+    train_recall = recall_score(Y_train,
+                        predicts_train,
+                        average = "weighted"
+                        )
     
-    return test_acc, test_f1, train_acc, train_f1
+    
+    return test_acc, test_f1, test_recall, train_acc, train_f1, train_recall
 
 
 def per_tag_accuracy(
