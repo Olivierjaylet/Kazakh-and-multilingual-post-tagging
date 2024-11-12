@@ -1,10 +1,10 @@
 # Kazakh-and-multilingual-post-tagging
 
-## Project Overview
+## Introduction
 Part of speach tagging is the process of assigning each word of a sentence a grammatical category, based on its role. Common POS categories include nouns, verbs, adjectives, adverbs, and prepositions.
 This stage can be important in natural language processing (NLP) to make the machine understand the role of each word. Being able to predict the POS of each word in a sentence efficiently enough can add important information to many NLP tasks. For example, knowing the POS of a word can help in lemmatization, since in some languages, a word can have different lemmas depending on whether it is a verb or an adjective. In English, the word "saw" can either be from the lemma of the verb "seeing" or of the noun "saw".
 In sentiment analysis, identifying the POS tag can also contribute to improve performance, since adverbs and adjectives often refer to feelings or tones. For instance, part-of-speach taggin also aids in other NLP application such as syntactic parsing, machine translation, named entity recognition (NER), and text-to-speech synthesis, where understanding sentence structure improves output accuracy.
-However, there are around 7000 languages in the world, and many different roots. Indeed, Latin, Germanic, Turkic, Slavic, Indo-Aryan, or Dravidian languages all have different grammatical structures. The existence of so many languages makes it difficult 
+However, there are around 7000 languages in the world, and many different roots. Indeed, Latin, Germanic, Turkic, Slavic, Indo-Aryan, or Dravidian languages all have different grammatical structures. The existence of so many languages makes it difficult to generalize classical part-of-speech tag prediction algorithms.
 
 ## Content
 The notebook main.ipynb displays some results table for the three languages.
