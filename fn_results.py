@@ -12,6 +12,7 @@ import os
 
 
 
+
 def calculate_results(Y_test,
                       Y_train, 
                       predicts_test, 
@@ -219,7 +220,7 @@ def plot_confusion_matrix(
                 yticklabels=list_tags,
                 ax=ax)
 
-    plot_title = 'Confusion Matrix of ' + title + " for " + lang + "corpus"
+    plot_title = 'Confusion Matrix of ' + title + " for " + lang + " corpus"
     ax.set_title(plot_title)
     ax.set_xlabel('Predicted Labels')
     ax.set_ylabel('True Labels')

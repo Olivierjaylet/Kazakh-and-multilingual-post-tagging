@@ -11,6 +11,7 @@ import numpy as np
 import os
 
 
+
 ###################################################################################################
 ####################################### FEATURE ENGINEERING #######################################
 ###################################################################################################
@@ -71,54 +72,6 @@ def clean_data(
 
     return df
 
-"""
-def clean_data(
-        df
-        ):
-    """
-    #Cleans the input DataFrame by dropping NaN values and removing punctuation.
-
-    #Args:
-    #    df (pandas.DataFrame): DataFrame containing 'WORD' and 'POS' columns.
-
-    #Returns:
-    #    tuple: A tuple containing:
-    #        - X_lex (numpy.ndarray): Array of cleaned words.
-    #        - Y_lex (numpy.ndarray): Array of cleaned POS tags.
-"""
-
-    # Drop rows where 'WORD' is NaN
-    df = df.dropna(subset=['WORD'])
-
-    # Remove punctuation characters
-    df = df[df['POS'] != 'PUNCT']
-
-    # Some characters to remove
-    #chars_to_remove = r"[\#\$\%\&\(\)\+\:\@]"
-    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\–\’\:\@\']"
-
-    # Removing the characters from the 'WORD' column
-    df['WORD'] = df['WORD'].str.replace(chars_to_remove,
-                                        '',
-                                        regex=True
-                                        )
-    
-    # list of tags we want to predict
-    POS_tag_keep = ['NOUN', 'VERB', 'ADJ', 'PROPN', 'NUM', 'ADV', 'ADP', 'CCONJ', 'PRON', 'DET', 'SCONJ', 'AUX', 'INTJ', 'PUNCT']
-    
-    df = df[df['POS'].isin(POS_tag_keep)]
-
-    # convert to string type
-    df["WORD"] = df["WORD"].astype(str)
-    df["POS"] = df["POS"].astype(str)
-
-    df = df.head(n=20000
-                )
-
-    print("Size dataset : ", df.shape)
-
-    return df
-    """
 
 def get_values(df_) :
     X_lex = df_['WORD'].str.strip()

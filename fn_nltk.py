@@ -11,6 +11,7 @@ import numpy as np
 import os
 
 
+
 def data_to_nltk(df):
     # Convert the data into the format that NLTK expects (list of tuples)
     tagged_sentences = []
