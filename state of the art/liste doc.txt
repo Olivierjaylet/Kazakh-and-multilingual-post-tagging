@@ -1,3 +1,4 @@
+############### State of the art
 - Improving neural machine translation with POS-tag features for low-resource language pairs : https://www.cell.com/heliyon/fulltext/S2405-8440(22)01663-2
 - Real-World Semi-Supervised Learning
 of POS-Taggers for Low-Resource Languages : https://aclanthology.org/P13-1057.pdf
@@ -7,6 +8,7 @@ of POS-Taggers for Low-Resource Languages : https://aclanthology.org/P13-1057.pd
 
 - What Can We Get From 1000 Tokens?
 A Case Study of Multilingual POS Tagging For Resource-Poor Languages : https://aclanthology.org/D14-1096.pdf
+
 
 ##########################
 TFIDF : 
