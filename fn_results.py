@@ -100,52 +100,63 @@ def per_tag_accuracy(
     return df_accuracy
 
 
+
+
 def mistake_frequency_by_word_type(
         y_true, 
         y_pred, 
         list_tags, 
-        encoder
-        ) :
-    """Calculates the frequency of mistakes by word type in the predictions.
+        encoder,
+        top_n=10
+        ):
+    """
+    Calculates and plots the normalized frequency of mistakes by word type.
 
     Args:
         y_true (array-like): True labels.
         y_pred (array-like): Predicted labels.
         list_tags (list): List of POS tags.
         encoder (LabelEncoder): Label encoder for transforming tags.
+        top_n (int): Number of top frequent mistakes to plot.
 
     Returns:
-        pandas.DataFrame: DataFrame of mistake frequencies sorted by frequency.
+        pandas.DataFrame: DataFrame of normalized mistake frequencies sorted by frequency.
     """
-
+    # Decode labels
     y_true_decoded = encoder.inverse_transform(y_true)
     y_pred_decoded = encoder.inverse_transform(y_pred)
 
+    # Compute confusion matrix
     cm = confusion_matrix(y_true_decoded, 
                           y_pred_decoded, 
-                          labels=list_tags
-                          )
+                          labels=list_tags)
 
+    # Create confusion matrix DataFrame
     cm_df = pd.DataFrame(cm, 
                          index=list_tags, 
-                         columns=list_tags
-                         )
+                         columns=list_tags)
 
     mistake_freq_records = []
 
+    # Calculate mistake frequencies
     for true_tag in list_tags:
         for pred_tag in list_tags:
             if true_tag != pred_tag:
                 frequency = cm_df.loc[true_tag, pred_tag]
                 if frequency > 0:
+                    # Normalize frequency by the total occurrences of the true tag
+                    total_true_tag = cm_df.loc[true_tag].sum()
+                    normalized_frequency = frequency / total_true_tag
                     mistake_freq_records.append({'From Tag': true_tag, 
                                                  'To Tag': pred_tag, 
-                                                 'Frequency': frequency}
-                                                 )
+                                                 'Frequency': normalized_frequency,
+                                                 'nb_mispredictions' : frequency})
 
+    # Create DataFrame of mistakes
     mistake_freq_df = pd.DataFrame(mistake_freq_records)
 
-    return mistake_freq_df.sort_values(by='Frequency', ascending=False)
+    # Sort by normalized frequency
+    return  mistake_freq_df.sort_values(by='nb_mispredictions', ascending=False)
 
 
 def tag_prediction_nb(
