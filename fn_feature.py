@@ -37,64 +37,12 @@ def list_all_POS_tags(
                 list_tags.append(tag)
     return list_tags
 
-def clean_data(
-        df
-        ):
-    # Drop rows where 'WORD' is NaN
-    df = df.dropna(subset=['WORD'])
 
-    # Remove punctuation characters
-    #df = df[df['POS'] != 'PUNCT']
-    df = df[(df['POS'] != 'PUNCT') | (df['WORD'] == '.')]
-    # Some characters to remove
-    #chars_to_remove = r"[\#\$\%\&\(\)\+\:\@]"
-    chars_to_remove = r"[\#\$\%\&\(\)\+\,\-\–\’\:\@\']"
-
-    # Removing the characters from the 'WORD' column
-    df['WORD'] = df['WORD'].str.replace(chars_to_remove,
-                                        '',
-                                        regex=True
-                                        )
-    
-    # list of tags we want to predict
-    POS_tag_keep = ['NOUN', 'VERB', 'ADJ', 'PROPN', 'NUM', 'ADV', 'ADP', 'CCONJ', 'PRON', 'DET', 'SCONJ', 'AUX', 'INTJ', 'PUNCT']
-    
-    df = df[df['POS'].isin(POS_tag_keep)]
-
-    # convert to string type
-    df["WORD"] = df["WORD"].astype(str)
-    df["POS"] = df["POS"].astype(str)
-
-    df = df.head(n=20000
-                )
-
-    print("Size dataset : ", df.shape)
-
-    return df
-
-
-def get_values(df_) :
-    X_lex = df_['WORD'].str.strip()
-    X_lex = X_lex.values
-
-    y_lex = df_['POS'].str.strip()
-    y_lex = y_lex.values
+def get_values(sentences):
+    X_lex = np.array([word for sentence in sentences for word, _ in sentence], dtype=object)
+    y_lex = np.array([pos for sentence in sentences for _, pos in sentence], dtype=object)
     return X_lex, y_lex
- 
 
-def set_up_POS_tag_encoder(
-        list_tags
-        ) :
-    """Sets up a label encoder for the POS tags.
-
-    Args:
-        list_tags (list): List of POS tags.
-
-    Returns:
-        LabelEncoder: A fitted label encoder for the provided POS tags.
-    """
-    encoder_tag = LabelEncoder().fit(list_tags)
-    return encoder_tag
 
 
 # vec encoding of words
